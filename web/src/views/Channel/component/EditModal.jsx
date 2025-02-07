@@ -153,6 +153,12 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
     return modelList;
   };
 
+  const getItemDisabled = () => {
+    // return hasTag
+    return false;
+  }
+
+
   const getProviderModels = async (values, setFieldValue) => {
     setProviderModelsLoad(true);
     try {
@@ -443,7 +449,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
                       handleChange(e);
                       handleTypeChange(setFieldValue, e.target.value, values);
                     }}
-                    disabled={hasTag}
+                    disabled={getItemDisabled()}
                     MenuProps={{
                       PaperProps: {
                         style: {
@@ -577,7 +583,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
                     type="text"
                     value={values.other}
                     name="other"
-                    disabled={hasTag}
+                    disabled={getItemDisabled()}
                     onBlur={handleBlur}
                     onChange={handleChange}
                     inputProps={{}}
@@ -599,7 +605,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
                   id="channel-groups-label"
                   options={groupOptions}
                   value={values.groups}
-                  disabled={hasTag}
+                  disabled={getItemDisabled()}
                   onChange={(e, value) => {
                     const event = {
                       target: {
@@ -632,7 +638,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
                     freeSolo
                     disableCloseOnSelect
                     id="channel-models-label"
-                    disabled={hasTag}
+                    disabled={getItemDisabled()}
                     options={modelOptions}
                     value={values.models}
                     inputValue={inputValue}
@@ -741,7 +747,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
                     {t('channel_edit.copyModels')}
                   </Button>
                   <Button
-                    disabled={hasTag}
+                    disabled={getItemDisabled()}
                     onClick={() => {
                       setFieldValue('models', basicModels(values.type));
                     }}
@@ -749,7 +755,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
                     {t('channel_edit.inputChannelModel')}
                   </Button>
                   <Button
-                    disabled={hasTag}
+                    disabled={getItemDisabled()}
                     onClick={() => {
                       setFieldValue('models', modelOptions);
                     }}
@@ -760,7 +766,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
                     <Tooltip title={customizeT(inputPrompt.provider_models_list)} placement="top">
                       <LoadingButton
                         loading={providerModelsLoad}
-                        disabled={hasTag}
+                        disabled={getItemDisabled()}
                         onClick={() => {
                           getProviderModels(values, setFieldValue);
                         }}
@@ -824,7 +830,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
                     onChange={(newValue) => {
                       setFieldValue('model_mapping', newValue);
                     }}
-                    disabled={hasTag}
+                    disabled={getItemDisabled()}
                     error={Boolean(touched.model_mapping && errors.model_mapping)}
                   />
                   {touched.model_mapping && errors.model_mapping ? (
@@ -847,7 +853,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
                     onChange={(newValue) => {
                       setFieldValue('model_headers', newValue);
                     }}
-                    disabled={hasTag}
+                    disabled={getItemDisabled()}
                     error={Boolean(touched.model_headers && errors.model_headers)}
                   />
                   {touched.model_headers && errors.model_headers ? (
@@ -864,7 +870,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
                 <OutlinedInput
                   id="channel-proxy-label"
                   label={customizeT(inputLabel.proxy)}
-                  disabled={hasTag}
+                  disabled={getItemDisabled()}
                   type="text"
                   value={values.proxy}
                   name="proxy"
@@ -888,7 +894,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
                     id="channel-test_model-label"
                     label={customizeT(inputLabel.test_model)}
                     type="text"
-                    disabled={hasTag}
+                    disabled={getItemDisabled()}
                     value={values.test_model}
                     name="test_model"
                     onBlur={handleBlur}
@@ -916,7 +922,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
                     name="pre_cost"
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    disabled={hasTag}
+                    disabled={getItemDisabled()}
                     MenuProps={{
                       PaperProps: {
                         style: {
@@ -947,7 +953,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
                   <FormControlLabel
                     control={
                       <Switch
-                        disabled={hasTag}
+                        disabled={getItemDisabled()}
                         checked={values.only_chat === true}
                         onClick={() => {
                           setFieldValue('only_chat', !values.only_chat);
@@ -1008,7 +1014,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
                                       <Switch
                                         key={name}
                                         name={name}
-                                        disabled={hasTag}
+                                        disabled={getItemDisabled()}
                                         checked={values.plugin?.[pluginId]?.[paramId] || false}
                                         onChange={(event) => {
                                           setFieldValue(name, event.target.checked);
@@ -1025,7 +1031,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
                                     multiline
                                     key={name}
                                     name={name}
-                                    disabled={hasTag}
+                                    disabled={getItemDisabled()}
                                     value={values.plugin?.[pluginId]?.[paramId] || ''}
                                     label={customizeT(param.name)}
                                     placeholder={customizeT(param.description)}
