@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { CHANNEL_OPTIONS } from 'constants/ChannelConstants';
 import { useTheme } from '@mui/material/styles';
 import { API } from 'utils/api';
-import { showError, showSuccess, trims } from 'utils/common';
+import { showError, showSuccess, trims, copy } from 'utils/common';
 import {
   Dialog,
   DialogTitle,
@@ -88,8 +88,6 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
   const [hasTag, setHasTag] = useState(false);
   const [expanded, setExpanded] = useState(false);
 
-
-
   const initChannel = (typeValue) => {
     if (typeConfig[typeValue]?.inputLabel) {
       setInputLabel({ ...defaultConfig.inputLabel, ...typeConfig[typeValue].inputLabel });
@@ -154,11 +152,6 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
     });
     return modelList;
   };
-
-  const getItemDisabled = () => {
-    // return hasTag
-    return false;
-  }
 
   const getProviderModels = async (values, setFieldValue) => {
     setProviderModelsLoad(true);
@@ -450,7 +443,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
                       handleChange(e);
                       handleTypeChange(setFieldValue, e.target.value, values);
                     }}
-                    disabled={getItemDisabled()}
+                    disabled={hasTag}
                     MenuProps={{
                       PaperProps: {
                         style: {
@@ -584,7 +577,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
                     type="text"
                     value={values.other}
                     name="other"
-                    disabled={getItemDisabled()}
+                    disabled={hasTag}
                     onBlur={handleBlur}
                     onChange={handleChange}
                     inputProps={{}}
@@ -606,7 +599,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
                   id="channel-groups-label"
                   options={groupOptions}
                   value={values.groups}
-                  disabled={getItemDisabled()}
+                  disabled={hasTag}
                   onChange={(e, value) => {
                     const event = {
                       target: {
@@ -633,64 +626,98 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
               </FormControl>
 
               <FormControl fullWidth sx={{ ...theme.typography.otherInput }}>
-                <Autocomplete
-                  multiple
-                  freeSolo
-                  id="channel-models-label"
-                  disabled={getItemDisabled()}
-                  options={modelOptions}
-                  value={values.models}
-                  onChange={(e, value) => {
-                    const event = {
-                      target: {
-                        name: 'models',
-                        value: value.map((item) =>
-                          typeof item === 'string' ? { id: item, group: t('channel_edit.customModelTip') } : item
-                        )
+                <Box sx={{ position: 'relative' }}>
+                  <Autocomplete
+                    multiple
+                    freeSolo
+                    disableCloseOnSelect
+                    id="channel-models-label"
+                    disabled={hasTag}
+                    options={modelOptions}
+                    value={values.models}
+                    inputValue={inputValue}
+                    onInputChange={(event, newInputValue) => {
+                      if (newInputValue.includes(',')) {
+                        const modelsList = newInputValue
+                          .split(',')
+                          .map((item) => ({
+                            id: item.trim(),
+                            group: t('channel_edit.customModelTip')
+                          }))
+                          .filter((item) => item.id);
+
+                        const updatedModels = [...new Set([...values.models, ...modelsList])];
+                        const event = {
+                          target: {
+                            name: 'models',
+                            value: updatedModels
+                          }
+                        };
+                        handleChange(event);
+                        setInputValue('');
+                      } else {
+                        setInputValue(newInputValue);
                       }
-                    };
-                    handleChange(event);
-                  }}
-                  onBlur={handleBlur}
-                  // filterSelectedOptions
-                  disableCloseOnSelect
-                  renderInput={(params) => (
-                    <TextField {...params} name="models" error={Boolean(errors.models)} label={customizeT(inputLabel.models)} />
-                  )}
-                  groupBy={(option) => option.group}
-                  getOptionLabel={(option) => {
-                    if (typeof option === 'string') {
-                      return option;
+                    }}
+                    onChange={(e, value) => {
+                      const event = {
+                        target: {
+                          name: 'models',
+                          value: value.map((item) =>
+                            typeof item === 'string' ? { id: item, group: t('channel_edit.customModelTip') } : item
+                          )
+                        }
+                      };
+                      handleChange(event);
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        name="models"
+                        error={Boolean(errors.models)}
+                        label={customizeT(inputLabel.models)}
+                        InputProps={{
+                          ...params.InputProps
+                        }}
+                      />
+                    )}
+                    groupBy={(option) => option.group}
+                    getOptionLabel={(option) => {
+                      if (typeof option === 'string') {
+                        return option;
+                      }
+                      if (option.inputValue) {
+                        return option.inputValue;
+                      }
+                      return option.id;
+                    }}
+                    filterOptions={(options, params) => {
+                      const filtered = filter(options, params);
+                      const { inputValue } = params;
+                      const isExisting = options.some((option) => inputValue === option.id);
+                      if (inputValue !== '' && !isExisting) {
+                        filtered.push({
+                          id: inputValue,
+                          group: t('channel_edit.customModelTip')
+                        });
+                      }
+                      return filtered;
+                    }}
+                    renderOption={(props, option, { selected }) => (
+                      <li {...props}>
+                        <Checkbox icon={icon} checkedIcon={checkedIcon} style={{ marginRight: 8 }} checked={selected} />
+                        {option.id}
+                      </li>
+                    )}
+                    renderTags={(value, getTagProps) =>
+                      value.map((option, index) => (
+                        <Box key={index} sx={{ display: 'flex', alignItems: 'center' }}>
+                          <Chip label={option.id} {...getTagProps({ index })} onClick={() => copy(option.id)} />
+                        </Box>
+                      ))
                     }
-                    if (option.inputValue) {
-                      return option.inputValue;
-                    }
-                    return option.id;
-                  }}
-                  filterOptions={(options, params) => {
-                    const filtered = filter(options, params);
-                    const { inputValue } = params;
-                    const isExisting = options.some((option) => inputValue === option.id);
-                    if (inputValue !== '' && !isExisting) {
-                      filtered.push({
-                        id: inputValue,
-                        group: t('channel_edit.customModelTip')
-                      });
-                    }
-                    return filtered;
-                  }}
-                  renderOption={(props, option, { selected }) => (
-                    <li {...props}>
-                      <Checkbox icon={icon} checkedIcon={checkedIcon} style={{ marginRight: 8 }} checked={selected} />
-                      {option.id}
-                    </li>
-                  )}
-                  renderTags={(value, getTagProps) =>
-                    value.map((option, index) => (
-                      <Chip key={index} label={option.id} {...getTagProps({ index })} onClick={() => handleModelTagClick(option.id)} />
-                    ))
-                  }
-                />
+                  />
+                </Box>
                 {errors.models ? (
                   <FormHelperText error id="helper-tex-channel-models-label">
                     {errors.models}
@@ -706,7 +733,15 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
               >
                 <ButtonGroup variant="outlined" aria-label="small outlined primary button group">
                   <Button
-                    disabled={getItemDisabled()}
+                    onClick={() => {
+                      const modelString = values.models.map((model) => model.id).join(',');
+                      copy(modelString);
+                    }}
+                  >
+                    {t('channel_edit.copyModels')}
+                  </Button>
+                  <Button
+                    disabled={hasTag}
                     onClick={() => {
                       setFieldValue('models', basicModels(values.type));
                     }}
@@ -714,7 +749,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
                     {t('channel_edit.inputChannelModel')}
                   </Button>
                   <Button
-                    disabled={getItemDisabled()}
+                    disabled={hasTag}
                     onClick={() => {
                       setFieldValue('models', modelOptions);
                     }}
@@ -725,7 +760,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
                     <Tooltip title={customizeT(inputPrompt.provider_models_list)} placement="top">
                       <LoadingButton
                         loading={providerModelsLoad}
-                        disabled={getItemDisabled()}
+                        disabled={hasTag}
                         onClick={() => {
                           getProviderModels(values, setFieldValue);
                         }}
@@ -789,7 +824,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
                     onChange={(newValue) => {
                       setFieldValue('model_mapping', newValue);
                     }}
-                    disabled={getItemDisabled()}
+                    disabled={hasTag}
                     error={Boolean(touched.model_mapping && errors.model_mapping)}
                   />
                   {touched.model_mapping && errors.model_mapping ? (
@@ -812,7 +847,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
                     onChange={(newValue) => {
                       setFieldValue('model_headers', newValue);
                     }}
-                    disabled={getItemDisabled()}
+                    disabled={hasTag}
                     error={Boolean(touched.model_headers && errors.model_headers)}
                   />
                   {touched.model_headers && errors.model_headers ? (
@@ -829,7 +864,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
                 <OutlinedInput
                   id="channel-proxy-label"
                   label={customizeT(inputLabel.proxy)}
-                  disabled={getItemDisabled()}
+                  disabled={hasTag}
                   type="text"
                   value={values.proxy}
                   name="proxy"
@@ -853,7 +888,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
                     id="channel-test_model-label"
                     label={customizeT(inputLabel.test_model)}
                     type="text"
-                    disabled={getItemDisabled()}
+                    disabled={hasTag}
                     value={values.test_model}
                     name="test_model"
                     onBlur={handleBlur}
@@ -881,7 +916,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
                     name="pre_cost"
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    disabled={getItemDisabled()}
+                    disabled={hasTag}
                     MenuProps={{
                       PaperProps: {
                         style: {
@@ -912,7 +947,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
                   <FormControlLabel
                     control={
                       <Switch
-                        disabled={getItemDisabled()}
+                        disabled={hasTag}
                         checked={values.only_chat === true}
                         onClick={() => {
                           setFieldValue('only_chat', !values.only_chat);
@@ -973,7 +1008,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
                                       <Switch
                                         key={name}
                                         name={name}
-                                        disabled={getItemDisabled()}
+                                        disabled={hasTag}
                                         checked={values.plugin?.[pluginId]?.[paramId] || false}
                                         onChange={(event) => {
                                           setFieldValue(name, event.target.checked);
@@ -990,7 +1025,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
                                     multiline
                                     key={name}
                                     name={name}
-                                    disabled={getItemDisabled()}
+                                    disabled={hasTag}
                                     value={values.plugin?.[pluginId]?.[paramId] || ''}
                                     label={customizeT(param.name)}
                                     placeholder={customizeT(param.description)}
