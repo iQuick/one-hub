@@ -31,8 +31,6 @@ import {
   Chip
 } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 
 import { Formik } from 'formik';
 import * as Yup from 'yup';
@@ -48,6 +46,7 @@ import ModelMappingInput from './ModelMappingInput';
 import ModelHeadersInput from './ModelHeadersInput';
 
 import pluginList from '../type/Plugin.json';
+import { Icon } from '@iconify/react';
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
@@ -87,6 +86,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
   const [providerModelsLoad, setProviderModelsLoad] = useState(false);
   const [hasTag, setHasTag] = useState(false);
   const [expanded, setExpanded] = useState(false);
+  const [inputValue, setInputValue] = useState('');
 
   const initChannel = (typeValue) => {
     if (typeConfig[typeValue]?.inputLabel) {
@@ -157,7 +157,6 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
     // return hasTag
     return false;
   }
-
 
   const getProviderModels = async (values, setFieldValue) => {
     setProviderModelsLoad(true);
@@ -364,19 +363,19 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
         data.model_mapping =
           data.model_mapping !== ''
             ? Object.entries(JSON.parse(data.model_mapping)).map(([key, value], index) => ({
-                index,
-                key,
-                value
-              }))
+              index,
+              key,
+              value
+            }))
             : [];
         // if (data.model_headers) {
         data.model_headers =
           data.model_headers !== ''
             ? Object.entries(JSON.parse(data.model_headers)).map(([key, value], index) => ({
-                index,
-                key,
-                value
-              }))
+              index,
+              key,
+              value
+            }))
             : [];
         // }
 
@@ -414,17 +413,6 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [channelId]);
-
-  const handleModelTagClick = (modelId) => {
-    navigator.clipboard
-      .writeText(modelId)
-      .then(() => {
-        showSuccess('模型名称已复制');
-      })
-      .catch((error) => {
-        showError('复制失败: ' + error.message);
-      });
-  };
 
   return (
     <Dialog open={open} onClose={onCancel} fullWidth maxWidth={'md'}>
@@ -984,7 +972,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
                             display: 'flex',
                             justifyContent: 'space-between',
                             alignItems: 'center',
-                            padding: 2,
+                            padding: 2
                           }}
                         >
                           <Box sx={{ flex: 1 }}>
@@ -993,7 +981,9 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
                           </Box>
                           <Button
                             onClick={() => setExpanded(!expanded)}
-                            endIcon={expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                            endIcon={
+                              expanded ? <Icon icon="solar:alt-arrow-up-line-duotone" /> : <Icon icon="solar:alt-arrow-down-line-duotone" />
+                            }
                             sx={{ textTransform: 'none', marginLeft: 2 }}
                           >
                             {expanded ? t('channel_edit.collapse') : t('channel_edit.expand')}
