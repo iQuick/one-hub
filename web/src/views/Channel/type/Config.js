@@ -225,7 +225,7 @@ const typeConfig = {
       models: ['tts-1', 'tts-1-hd']
     },
     prompt: {
-      test_model: '',
+      // test_model: '',
       base_url: '',
       other: '请输入你 Speech Studio 的位置/区域，例如：eastasia'
     }
@@ -332,7 +332,7 @@ const typeConfig = {
     prompt: {
       key: '密钥填写midjourney-proxy的密钥，如果没有设置密钥，可以随便填',
       base_url: '地址填写midjourney-proxy部署的地址',
-      test_model: '',
+      // test_model: '',
       model_mapping: ''
     },
     modelGroup: 'Midjourney'
@@ -373,7 +373,7 @@ const typeConfig = {
       models: ['sd3', 'sd3-turbo', 'stable-image-core']
     },
     prompt: {
-      test_model: ''
+      // test_model: ''
     },
     modelGroup: 'Stability AI'
   },
@@ -414,7 +414,7 @@ const typeConfig = {
     prompt: {
       key: '密钥填写Suno-API的密钥，如果没有设置密钥，可以随便填',
       base_url: '地址填写Suno-API部署的地址',
-      test_model: '',
+      // test_model: '',
       model_mapping: ''
     },
     modelGroup: 'Suno'
@@ -439,7 +439,7 @@ const typeConfig = {
     },
     prompt: {
       base_url: '',
-      test_model: ''
+      // test_model: ''
     },
     modelGroup: 'Siliconflow'
   },
@@ -448,7 +448,7 @@ const typeConfig = {
       models: ['jina-reranker-v2-base-multilingual']
     },
     prompt: {
-      test_model: ''
+      // test_model: ''
     },
     modelGroup: 'Jina'
   },
