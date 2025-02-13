@@ -115,7 +115,7 @@ export default function TagTableRow({ item, manageChannel, handleOpenModal, setM
           colSpan={20}
         >
           <Collapse in={openRow} timeout="auto" unmountOnExit>
-            <ChannelTable tag={item.tag} />
+            <ChannelTable tag={item.tag} handleOpenModal={handleOpenModal} setModalChannelId={setModalChannelId} />
           </Collapse>
         </TableCell>
       </TableRow>

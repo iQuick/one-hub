@@ -15,7 +15,7 @@ import { API } from 'utils/api';
 import { showError, showSuccess, trims } from 'utils/common';
 import { useTranslation } from 'react-i18next';
 
-export default function ChannelTable({ tag }) {
+export default function ChannelTable({ tag, handleOpenModal, setModalChannelId }) {
   const { t } = useTranslation();
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState('desc');
@@ -161,7 +161,14 @@ export default function ChannelTable({ tag }) {
             />
             <TableBody>
               {channels.map((row) => (
-                <ChannelTableRow item={row} key={'channelsTag' + row.id} hideEdit={true} manageChannel={manageChannel} />
+                <ChannelTableRow
+                  item={row}
+                  key={'channelsTag' + row.id}
+                  hideEdit={false}
+                  manageChannel={manageChannel}
+                  handleOpenModal={handleOpenModal}
+                  setModalChannelId={setModalChannelId}
+                />
               ))}
             </TableBody>
           </Table>
