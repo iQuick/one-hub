@@ -92,6 +92,9 @@ function statusInfo(t, status) {
 }
 
 export default function ChannelTableRow({ item, manageChannel, handleOpenModal, setModalChannelId, hideEdit }) {
+  // === custom stat
+  hideEdit = true
+  // === custom end
   const { t } = useTranslation();
   const [open, setOpen] = useState(null);
   const [openTest, setOpenTest] = useState(false);
