@@ -30,7 +30,7 @@ import ChannelTable from './ChannelTable';
 import { useTranslation } from 'react-i18next';
 import { Icon } from '@iconify/react';
 
-export default function TagTableRow({ item, manageChannel, handleOpenModal, setModalChannelId }) {
+export default function TagTableRow({ item, manageChannel, handleOpenModalChannel, handleOpenModalTag, setModalChannelId }) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(null);
   const [openDelete, setOpenDelete] = useState(false);
@@ -115,7 +115,7 @@ export default function TagTableRow({ item, manageChannel, handleOpenModal, setM
           colSpan={20}
         >
           <Collapse in={openRow} timeout="auto" unmountOnExit>
-            <ChannelTable tag={item.tag} handleOpenModal={handleOpenModal} setModalChannelId={setModalChannelId} />
+            <ChannelTable tag={item.tag} handleOpenModal={handleOpenModalChannel} setModalChannelId={setModalChannelId} />
           </Collapse>
         </TableCell>
       </TableRow>
@@ -133,7 +133,7 @@ export default function TagTableRow({ item, manageChannel, handleOpenModal, setM
         <MenuItem
           onClick={() => {
             handleCloseMenu();
-            handleOpenModal();
+            handleOpenModalTag();
             setModalChannelId(item.tag);
           }}
         >

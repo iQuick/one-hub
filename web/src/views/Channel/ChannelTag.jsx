@@ -34,6 +34,7 @@ export default function ChannelTag() {
   const [searchKeyword, setSearchKeyword] = useState(originalKeyword);
   const [groupOptions, setGroupOptions] = useState([]);
 
+  const [isTag, setIsTag] = useState(false);
   const [openModal, setOpenModal] = useState(false);
   const [editChannelId, setEditChannelId] = useState('');
 
@@ -81,9 +82,16 @@ export default function ChannelTag() {
     }
   };
 
-  const handleOpenModal = (channelId) => {
+  const handleOpenModalTag = (channelId) => {
     setEditChannelId(channelId);
     setOpenModal(true);
+    setIsTag(true)
+  };
+
+  const handleOpenModalChannel = (channelId) => {
+    setEditChannelId(channelId);
+    setOpenModal(true);
+    setIsTag(false)
   };
 
   const manageChannel = async (id, action) => {
@@ -199,7 +207,8 @@ export default function ChannelTag() {
                   item={row}
                   manageChannel={manageChannel}
                   key={'TagTableRow-' + row.tag}
-                  handleOpenModal={handleOpenModal}
+                  handleOpenModalChannel={handleOpenModalChannel}
+                  handleOpenModalTag={handleOpenModalTag}
                   setModalChannelId={setEditChannelId}
                 />
               ))}
@@ -224,7 +233,7 @@ export default function ChannelTag() {
         onOk={handleOkModal}
         channelId={editChannelId}
         groupOptions={groupOptions}
-        isTag={true}
+        isTag={isTag}
       />
     </>
   );
